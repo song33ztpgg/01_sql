@@ -193,33 +193,6 @@ SELECT e.empno
 
 
 ----------------------------------------------------------------------------  
-/*
-SELECT e.empno 
-     , e.ename 
-     , e.job 
-     , e.hiredate 
-     , e.sal 
-     , e.deptno
-  FROM emp 
-  ------------
-  SELECT e.empno 
-     , e.ename 
-     , e.job 
-     , e.hiredate 
-     , e.sal 
-     , e.deptno
-  FROM emp  
- WHERE e.job ='ALLEN'
-  ;
-  ------------
-  SELECT e.empno 사번 
-     , e.ename 이름
-     , e.job 직업
-     , e.hiredate 입사일
-     , e.sal 급여
-     , e.deptno 부서번호
-  FROM emp  
- WHERE deptno = 20 
- ;
 
-*/
+
+-
