@@ -177,10 +177,10 @@ SELECT e.empno
      , e.ename 
      , e.job 
      , TO_CHAR(DECODE(e.job  , 'CLEAK'     , e.sal * 0.05
-                     , 'SALESMAN'  , e.sal * 0.04
-                     , 'MANAGER'   , e.sal * 0.037
-                     , 'ANALYST'   , e.sal * 0.03 
-                     , 'PRESIDENT' , e.sal * 0.015 ),'$999.99')  "경조사 지원금"                        
+                             , 'SALESMAN'  , e.sal * 0.04
+                             , 'MANAGER'   , e.sal * 0.037
+                             , 'ANALYST'   , e.sal * 0.03 
+                             , 'PRESIDENT' , e.sal * 0.015 ),'$999.99')  "경조사 지원금"                        
   FROM emp e
 ;
 
