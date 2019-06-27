@@ -460,3 +460,284 @@ SELECT e.job
 
 -- 8. 년도별 입사 인원을 구하시오
 
+
+
+
+--------------------------------------------------------
+- 수업중 실습
+
+-- 1. 매니저별, 부하직원의 수를 구하고, 많은 순으로 정렬
+--   : mgr 컬럼이 그룹화 기준 컬럼
+SELECT e.MGR     as "매니저 사번"
+     , COUNT(*)  as "부하직원 수"
+  FROM emp e
+ WHERE e.MGR IS NOT NULL
+ GROUP BY e.MGR 
+;
+
+-- 2. 부서별 인원을 구하고, 인원수 많은 순으로 정렬
+--    : deptno 컬럼이 그룹화 기준 컬럼
+SELECT e.DEPTNO  as "부서 번호"
+     , COUNT(*)  as "인원(명)"
+  FROM emp e
+ WHERE e.DEPTNO IS NOT NULL
+ GROUP BY e.DEPTNO
+ ORDER BY "인원(명)" DESC
+;
+-- 2.2 deptno 가 null 인 데이터는 '부서 미배정' 으로 출력되도록 처리
+SELECT nvl(e.DEPTNO || '', '미배정') as "부서 번호"
+     , COUNT(*)  as "인원(명)"
+  FROM emp e
+ GROUP BY e.DEPTNO
+ ORDER BY "인원(명)" DESC
+;
+
+-- 3. 직무별 급여 평균 구하고, 급여평균 높은 순으로 정렬
+--   : job 이 그룹화 기준 컬럼
+SELECT e.JOB      as "직무"
+     , AVG(e.SAL) as "급여 평균"
+  FROM emp e
+ GROUP BY e.JOB
+ ORDER BY "급여 평균" DESC
+;
+
+-- 3.2 job 이 null 인 데이터는 '직무 미배정' 으로 출력되도록 처리
+SELECT nvl(e.JOB, '직무 미배정') as "직무"
+     , AVG(e.SAL)                as "급여 평균"
+  FROM emp e
+ GROUP BY e.JOB
+ ORDER BY "급여 평균" DESC
+;
+
+-- 4. 직무별 급여 총합 구하고, 총합 높은 순으로 정렬
+--   : job 이 그룹화 기준 컬럼
+SELECT e.JOB      as "직무"
+     , SUM(e.SAL) as "급여 총합"
+  FROM emp e
+ GROUP BY e.JOB
+ ORDER BY "급여 총합" DESC
+;  
+
+-- 5. 급여의 앞단위가 1000미만, 1000, 2000, 3000, 5000 별로 인원수를 구하시오
+--    급여 단위 오름차순으로 정렬
+-- a) 급여 단위를 어떻게 구할 것인가? TRUNC() 활용
+SELECT e.EMPNO
+     , e.ENAME
+     , TRUNC(e.SAL, -3) as "급여 단위"
+  FROM emp e
+;
+
+-- b) TRUNC 로 얻어낸 급여단위를 COUNT 하면 인원수를 구할 수 있겠다.
+--    TRUNC(e.SAL, -3) 로 잘라낸 값이 그룹화 기준값으로 사용됨
+SELECT TRUNC(e.SAL, -3)       as "급여 단위"
+     , COUNT(TRUNC(e.SAL, -3))
+  FROM emp e
+ GROUP BY TRUNC(e.SAL, -3)
+ ORDER BY "급여 단위" 
+;
+
+-- c) 급여 단위가 1000 미만인 경우 0으로 출력되는 것을 변경
+--   : 범위 연산이 필요해 보임 ===> CASE 구문 선택
+SELECT CASE WHEN TRUNC(e.SAL, -3) < 1000 THEN '1000 미만'
+            ELSE TRUNC(e.SAL, -3) || ''            
+        END as "급여 단위"
+     , COUNT(TRUNC(e.SAL, -3)) "인원(명)"
+  FROM emp e
+ GROUP BY TRUNC(e.SAL, -3)
+ ORDER BY TRUNC(e.SAL, -3)
+;
+
+-------------------------------------------------------------------------------
+--- 5번을 다른 함수로 풀이
+-- a) sal 컬럼에 왼쪽으로 패딩을 붙여서 0을 채움
+SELECT e.EMPNO
+     , e.ENAME
+     , LPAD(e.SAL, 4, '0')
+  FROM emp e
+;
+-- b) 맨 앞의 글자를 잘라낸다. ==> 단위를 구함
+SELECT e.EMPNO
+     , e.ENAME
+     , SUBSTR(LPAD(e.SAL, 4, '0'), 1, 1)
+  FROM emp e
+;
+
+-- c) 단위로 처리 + COUNT + 그룹화
+SELECT SUBSTR(LPAD(e.SAL, 4, '0'), 1, 1) "급여 단위"
+     , COUNT(*) "인원(명)"
+  FROM emp e
+ GROUP BY SUBSTR(LPAD(e.SAL, 4, '0'), 1, 1)
+;  
+  
+-- d) 1000 단위로 출력 형태 변경
+SELECT CASE WHEN SUBSTR(LPAD(e.SAL, 4, '0'), 1, 1) = 0 THEN '1000 미만'
+            ELSE TO_CHAR(SUBSTR(LPAD(e.SAL, 4, '0'), 1, 1) * 1000)
+        END  "급여 단위"
+     , COUNT(*) "인원(명)"
+  FROM emp e
+ GROUP BY SUBSTR(LPAD(e.SAL, 4, '0'), 1, 1)
+ ORDER BY SUBSTR(LPAD(e.SAL, 4, '0'), 1, 1)
+;
+
+
+
+--------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+-- 6. 직무별 급여 합의 단위를 구하고, 급여 합의 단위가 큰 순으로 정렬
+-- a) job 별로 급여의 합을 구함 ==>  그룹화 기준 컬럼으로 job 을 사용
+SELECT e.JOB
+     , SUM(e.SAL)
+  FROM emp e
+ GROUP BY e.JOB
+;
+
+-- b) job 별 급여의 합에서 단위를 구함
+SELECT e.JOB
+     , TRUNC(SUM(e.SAL), -3) "급여 단위"
+  FROM emp e
+ GROUP BY e.JOB
+;
+
+-- c) 정렬, NULL 처리
+SELECT NVL(e.JOB, '미배정')  "직무"
+     , TRUNC(SUM(e.SAL), -3) "급여 단위"
+  FROM emp e
+ GROUP BY e.JOB
+ ORDER BY "급여 단위" DESC
+;
+
+-- 7. 직무별 급여 평균이 2000이하인 경우를 구하고 평균이 높은 순으로 정렬
+-- a) 직무별로 급여 평균을 구하자 : 그룹화 기준 컬럼 : job
+SELECT e.JOB
+     , AVG(e.SAL) "급여 평균"
+  FROM emp e
+ GROUP BY e.JOB
+;
+
+-- b) a에서 구해진 결과를 2000 이하 값으로 제한
+SELECT e.JOB
+     , AVG(e.SAL) "급여 평균"
+  FROM emp e
+ GROUP BY e.JOB
+HAVING AVG(e.SAL) <= 2000
+ ORDER BY "급여 평균" DESC
+;
+
+
+-- 8. 년도별 입사 인원을 구하시오
+--   : hiredate 를 활용 ==> 년도만 추출하여 그룹화 기준으로 사용
+-- a) hiredate 에서 년도 추출 : TO_CHAR(hiredate, 'YYYY')
+-- b) 기준값으로 그룹화 작성
+SELECT TO_CHAR(e.hiredate, 'YYYY') "입사 년도"
+     , COUNT(*) "인원(명)"
+  FROM emp e
+ GROUP BY TO_CHAR(e.hiredate, 'YYYY')
+ ORDER BY "입사 년도"
+; 
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------- 
+
+--9.년도별 월별 입사 인원을 구하시오. 
+-- : hiredate를 활용 
+--   hiredate 에서 년도, 월을 추출 
+--   추출된 두 값을 그룹화 기준으로 사용 
+--   입사인원은 COUNT그룹함수 사용
+
+-- a)년도 추출 : TO_CHAR(e.hiredate, 'YYYY') 
+--   월 추출   : TO_CHAR(e.hiredate, 'MM') 
+
+-- b) 두가지 기준으로 그룹화 적용
+
+SELECT TO_CHAR(e.hiredate, 'YYYY')  "입사 년도"
+     , TO_CHAR(e.hiredate, 'MM')   "입사 월"
+     , COUNT(*)                     "인원(명)"
+  FROM emp e 
+ GROUP BY TO_CHAR(e.hiredate, 'YYYY') , TO_CHAR(e.hiredate, 'MM') 
+ ORDER BY "입사 년도", "입사 월"
+; 
+
+-- c) 년도별, 월별 입사 인원의 출력을 가로 표 형태로 변환 
+
+-- a)년도 추출 : TO_CHAR(e.hiredate, 'YYYY') 
+--   월 추출   : TO_CHAR(e.hiredate, 'MM') 
+
+-- hiredate 에서 추출한 월의 값이 01 나올때 
+-- 그때의 행의 갯수를 1월에서 카운트 COUNT() 
+-- 이 과정을 12월 까지 반복 
+
+SELECT e.empno
+     , e.ename
+     , TO_CHAR(e.hiredate, 'YYYY') "입사 년도" 
+     , TO_CHAR(e.hiredate, 'MM')   "입사 월"
+     , DECODE(TO_CHAR(e.hiredate, 'MM'), '01' , 1) "1월"
+     , DECODE(TO_CHAR(e.hiredate, 'MM'), '02' , 1) "2월"
+     , DECODE(TO_CHAR(e.hiredate, 'MM'), '03' , 1) "3월"
+     , DECODE(TO_CHAR(e.hiredate, 'MM'), '04' , 1) "4월"
+     , DECODE(TO_CHAR(e.hiredate, 'MM'), '05' , 1) "5월"
+     , DECODE(TO_CHAR(e.hiredate, 'MM'), '06' , 1) "6월"
+     , DECODE(TO_CHAR(e.hiredate, 'MM'), '07' , 1) "7월"
+     , DECODE(TO_CHAR(e.hiredate, 'MM'), '08' , 1) "8월"
+     , DECODE(TO_CHAR(e.hiredate, 'MM'), '09' , 1) "9월"
+     , DECODE(TO_CHAR(e.hiredate, 'MM'), '10' , 1) "10월"
+     , DECODE(TO_CHAR(e.hiredate, 'MM'), '11' , 1) "11월"
+     , DECODE(TO_CHAR(e.hiredate, 'MM'), '12' , 1) "12월"
+  FROM emp e 
+ ORDER BY "입사 년도"
+;
+
+
+/*
+DECODE 12개를 사용해서 12개의 컬럼이 생긴다
+*/
+
+-- 그룹화 기준 컬럼을 "입사 년도"로 잡는다. 
+SELECT TO_CHAR(e.hiredate, 'YYYY') "입사 년도"
+     , COUNT(DECODE(TO_CHAR(e.hiredate, 'MM'), '01' , 1)) "1월"
+     , COUNT(DECODE(TO_CHAR(e.hiredate, 'MM'), '02' , 1)) "2월"
+     , COUNT(DECODE(TO_CHAR(e.hiredate, 'MM'), '03' , 1)) "3월"
+     , COUNT(DECODE(TO_CHAR(e.hiredate, 'MM'), '04' , 1)) "4월"
+     , COUNT(DECODE(TO_CHAR(e.hiredate, 'MM'), '05' , 1)) "5월"
+     , COUNT(DECODE(TO_CHAR(e.hiredate, 'MM'), '06' , 1)) "6월"
+     , COUNT(DECODE(TO_CHAR(e.hiredate, 'MM'), '07' , 1)) "7월"
+     , COUNT(DECODE(TO_CHAR(e.hiredate, 'MM'), '08' , 1)) "8월"
+     , COUNT(DECODE(TO_CHAR(e.hiredate, 'MM'), '09' , 1)) "9월"
+     , COUNT(DECODE(TO_CHAR(e.hiredate, 'MM'), '10' , 1)) "10월"
+     , COUNT(DECODE(TO_CHAR(e.hiredate, 'MM'), '11' , 1)) "11월"
+     , COUNT(DECODE(TO_CHAR(e.hiredate, 'MM'), '12' , 1)) "12월"
+  FROM emp e 
+ GROUP BY TO_CHAR(e.hiredate, 'YYYY') 
+ ORDER BY "입사 년도"
+;
+
+-- 월별 총 입사 인원의 합을 가로로 출력
+-- 그룹화 기준 컬럼이 필요 없음
+SELECT '인원(명)' AS "입사 월"     
+     , COUNT(DECODE(TO_CHAR(e.hiredate, 'MM'), '01' , 1)) "1월"
+     , COUNT(DECODE(TO_CHAR(e.hiredate, 'MM'), '02' , 1)) "2월"
+     , COUNT(DECODE(TO_CHAR(e.hiredate, 'MM'), '03' , 1)) "3월"
+     , COUNT(DECODE(TO_CHAR(e.hiredate, 'MM'), '04' , 1)) "4월"
+     , COUNT(DECODE(TO_CHAR(e.hiredate, 'MM'), '05' , 1)) "5월"
+     , COUNT(DECODE(TO_CHAR(e.hiredate, 'MM'), '06' , 1)) "6월"
+     , COUNT(DECODE(TO_CHAR(e.hiredate, 'MM'), '07' , 1)) "7월"
+     , COUNT(DECODE(TO_CHAR(e.hiredate, 'MM'), '08' , 1)) "8월"
+     , COUNT(DECODE(TO_CHAR(e.hiredate, 'MM'), '09' , 1)) "9월"
+     , COUNT(DECODE(TO_CHAR(e.hiredate, 'MM'), '10' , 1)) "10월"
+     , COUNT(DECODE(TO_CHAR(e.hiredate, 'MM'), '11' , 1)) "11월"
+     , COUNT(DECODE(TO_CHAR(e.hiredate, 'MM'), '12' , 1)) "12월"
+  FROM emp e 
+;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
