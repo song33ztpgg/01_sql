@@ -532,13 +532,60 @@ SELECT MAX(TO_CHAR(e.salary / 12 , '9999.9')) "하루급여"
 --7.논리 연산자 
 
 ----7.1) 성이 D로 시작하고 급여가 10,000 이하인 사람을 찾으시오
-SELECT e.first_name
+SELECT e.first_name 
+     , e.salary 
+     , e.manager_id
   FROM employees e 
- WHERE 'D%' LIKE e.last_name
-   AND e.commission_pct < 10000
+ WHERE e.last_name LIKE 'D%'
+   AND e.salary < 10000
+ ORDER BY e.first_name DES\
 ;
 
-----7.2) EMPLOYEE_ID 중 '121' 이하인 사람을 찾으시오
+----7.2) EMPLOYEE_ID 나 매니저 id 가 '110' 이하인 사람을 찾으시오
+SELECT e.first_name  이름
+     , e.employee_id ENPID 
+     , e.manager_id  매니저ID
+  FROM employees e  　
+ WHERE e.employee_id < 110 
+    OR e.manager_id < 110 
+ ORDER BY e.first_name
+; 
+
+/* 
+이름,     ENPID, 매니저ID 
+--------------------
+Adam	    121	    100
+Alberto	    147	    100
+Alexander	103 	102
+Bruce	    104	    103
+Daniel	    109	    108
+David	    105	    103
+Den	114	    100
+Diana	    107 	103
+Eleni	    149 	100
+Gerald	    148	    100
+Hermann	    204 	101
+Ismael	    111	    108
+Jennifer	200	    101
+John	    145 	100
+John	    110 	108
+Jose Manuel	112	    108
+Karen	    146	    100
+Kevin      	124	    100
+Lex	        102	    100
+Luis	    113	    108
+Matthew	    120	    100
+Michael	    201	    100
+Nancy	    108	    101
+Neena	    101	    100
+Payam	    122	    100
+Shanta	    123	    100
+Shelley 	205	    101
+Steven	    100	
+Susan	    203	    101
+Valli	    106 	103
+*/
+
 
 ----7.3) SALARY 중 '7500' 이상인 성과, 이름을 찾으시오 
 LAST 
