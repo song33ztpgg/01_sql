@@ -96,7 +96,7 @@ DROP TABLE member;
 --3.테이블 수정 구문 
 /*
 수정의 종류 
-1. 컬럼을 추가 : ADO
+1. 컬럼을 추가 : ADD
 2. 컬럼을 수정 : MODIFY
 3. 컬럼을 삭제 : DROP COLUMN 
 
@@ -245,6 +245,7 @@ MEMBER	    74699	TABLE
 
 -- 테이블 생성 기법중 이미 존재하는 테이블로 부터 복사 생성
 -- 테이블 구조 복사 생성 구문 
+
 CREATE TABLE 테이블 이름 
 AS 
 SELECT 컬럼이름 
@@ -280,12 +281,24 @@ COMMIT;
 
 --3D월생의 정보만 복사해서 새 테이블을 생성
 
-CREATE TABLE march_member 
+DROP TABLE TAAAAAAAST2;
+CREATE TABLE TAAAAAAAST
 AS 
 SELECT  m.* 
   FROM member m 
- WHERE  m.birth_month = 3 
+ WHERE  3 = 3 
 ; 
+
+CREATE TABLE TAAAAAAAST2
+AS 
+SELECT  m.* 
+  FROM member m 
+ WHERE 1 = 3 
+; 
+
+
+
+
 --복사하여 테이블 생성시 참이 될 수 있는 조건을 주면 
 --해당 조건을 만족하는 행의 데이터까지 복사되면서 테이블 생성
 --항상 참이 되는 조건을 주면 모든 데이터를 복사하면서 테이블 생성 
@@ -321,10 +334,12 @@ SELECT m.*
 --   : 데이터가 소실되면 안되므로 변경에 제약이 있음
 --     타입 변경은 같은 타입내에세만 가능  
 --     문자 타입간의 CHAR -> VARCHAR2 변경가능 
+
+--3) 기본값(DEFAULT)설정은 수정 이후 값부터 적용됨
 --     크기 변경은 동일 혹은 커지는 방향으로만 간으  
 --     숫자 타입의 크기변경은 정밀도가 커지는 방향으로만 가능
 
---3) 기본값(DEFAULT)설정은 수정 이후 값부터 적용됨 
+ 
 --ex) 3월 생일 맴버만 복사한 MARCH_MEMBER 테이블을 생각해보자 
 --    : BIRTH_MONTH 컬럼의 값이 항상 3으로 고정되어도 될 것 같다. 
 
@@ -339,7 +354,7 @@ ALTER TABLE march_member MODIFY (BIRTH_MONTH DEFAULT 3);
 --Table MARCH_MEMBER 
 
 --c) MARCH_MEMBER 테이블
-NSERT INTO "SCOTT"."MEMBER" (MEMBER_ID, MEMBER_NAME, ADDRESS, MAJOR, GENDER) VALUES ('M007', '홍길동', '율도국', '도술', 'M');
+INSERT INTO "SCOTT"."MEMBER" (MEMBER_ID, MEMBER_NAME, ADDRESS, MAJOR, GENDER) VALUES ('M007', '홍길동', '율도국', '도술', 'M');
 COMMIT;
 
 
